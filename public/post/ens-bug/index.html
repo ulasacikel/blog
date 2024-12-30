@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <title>Security Research Blog</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="A funny little overflow bug in ENS that landed me $100,000" />
+
+    
+    
+    
+    <link rel="stylesheet" href="../../css/theme.min.css">
+
+    
+    
+    
+
+    
+</head>
+<body>
+        <div id="content" class="mx-auto"><header class="container mt-sm-5 mt-4 mb-4 mt-xs-1">
+    <div class="row">
+        
+        <div class="col-sm-4 col-12 text-sm-right text-center pt-sm-4">
+            <a href="../../" class="text-decoration-none">
+                <img id="home-image" class="rounded-circle"
+                    
+                        
+                            src="../../images/profile.jpeg"
+                        
+                    
+                />
+            </a>
+        </div>
+        <div class="col-sm-8 col-12 text-sm-left text-center">
+        
+            <h2 class="m-0 mb-2 mt-4">
+                <a href="../../" class="text-decoration-none">
+                    
+                        Ulas Anil Acikel
+                    
+                </a>
+            </h2>
+            <p class="text-muted mb-1">
+                
+                    Application Security Engineer | Istanbul
+                
+            </p>
+            <ul id="nav-links" class="list-inline mb-2">
+                
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../about/" title="About">About</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../post/" title="Posts">Posts</a>
+                    </li>
+                
+                    <li class="list-inline-item">
+                        <a class="badge badge-white " href="../../categories/" title="Categories">Categories</a>
+                    </li>
+                
+            </ul>
+            <ul id="nav-social" class="list-inline">
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="http://github.com/ulasacikel" target="_blank">
+                            <i class="fab fa-github fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="https://www.linkedin.com/in/ulas-acikel/" target="_blank">
+                            <i class="fab fa-linkedin-in fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="https://x.com/_ulasanil" target="_blank">
+                            <i class="fab fa-twitter fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+                    <li class="list-inline-item mr-3">
+                        <a href="mailto:ulas.acikel@gmail.com" target="_blank">
+                            <i class="fas fa-envelope fa-1x text-muted"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+    <hr />
+</header>
+<div class="container">
+    <div class="pl-sm-2">
+        <div class="mb-3">
+            <h3 class="mb-0">A funny little overflow bug in ENS (Ethereum Name Service) that landed me $100,000</h3>
+            
+            <small class="text-muted">Published December 17, 2024</small>
+        </div>
+
+        <article>
+            <p>Lets start with an arbitrary quote from Sun Tzu because why not and I like random quotes:</p>
+<blockquote>
+<p>know yourself and you will win all battles <br>
+- Sun Tzu</p>
+</blockquote>
+<p>This is my story about a funny little overflow bug I found in <a href="https://ens.domains/">ENS</a> that landed me $100,000. The &ldquo;funny&rdquo; part is that I wasn&rsquo;t even looking for a bug in the ENS protocol. I was just trying to understand how ENS works.</p>
+<p>It all started when I saw a new ENS audit contest was starting on <a href="https://code4rena.com/audits/2023-04-ens-contest">Code4rena</a>.</p>
+
+
+<style type="text/css">
+    .box-shortcode {
+      padding: 1.6em;
+      padding-top: 1.4em;
+      line-height: 1.4em;
+      margin-top: 1em;
+      margin-bottom: 2em;
+      border-radius: 4px;
+      color: #444;
+      background: #f3ebe850;
+    }
+
+    .box-title {
+      margin: -18px -18px 12px;
+      padding: 4px 18px;
+      border-radius: 4px 4px 0 0;
+      font-weight: 700;
+      color: #fff;
+      background: #6ab0de;
+    }
+    .box-shortcode.warning .box-title {
+      background: #ff6b6b;
+    }
+    .box-shortcode.warning {
+      background: #ff6b6b4f;
+    }
+    .box-shortcode.info .box-title {
+      background: #0089e488;
+    }
+    .box-shortcode.info {
+      background: #0089e41c;
+      box-shadow: 3px 3px 5px #0089e410;
+    }
+    .box-shortcode.important .box-title {
+      background: #f7ec2c;
+    }
+    .box-shortcode.important {
+      background: #f7ec2c7d;
+    }
+    .box-shortcode.tip .box-title {
+      background: #a3ffa34d;
+    }
+    .box-shortcode.tip {
+      background: #a3ffa34d;
+      box-shadow: 3px 3px 5px #0089e410;
+    }
+    .icon-box {
+      display: inline-flex;
+      align-self: center;
+      margin-right: 8px;
+    }
+    .icon-box img,
+    .icon-box svg {
+      height: 1em;
+      width: 1em;
+      fill: currentColor;
+    }
+    .icon-box img,
+    .icon-box.baseline svg {
+      top: 0.125em;
+      position: relative;
+    }
+    .box-shortcode p {
+      margin-bottom: 0.6em;
+    }
+    .box-shortcode p:first-of-type {
+      display: inline;
+    }
+    .box-shortcode p:nth-of-type(2) {
+      margin-top: 0.6em;
+    }
+    .box-shortcode p:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+
+  
+  <svg width="0" height="0" display="none" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="tip-box" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet">
+      <path
+        d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"/>
+    </symbol>
+    <symbol id="important-box" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet">
+      <path
+        d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/>
+    </symbol>
+    <symbol id="warning-box" viewBox="0 0 576 512" preserveAspectRatio="xMidYMid meet">
+      <path
+        d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/>
+    </symbol>
+    <symbol id="info-box" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet">
+      <path
+        d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"/>
+    </symbol>
+  </svg><div class="box box-shortcode info" >
+    <span class="icon-box baseline">
+      <svg><use href="#info-box"></use></svg>
+    </span>
+    <p>If you aren&rsquo;t familiar with Code4rena, it&rsquo;s a platform where you can participate in audit contests for various web3 protocols. The contests run for a certain period of time, have a fixed reward pool and the winners share the pool. <a href="https://docs.code4rena.com/">Check out the docs for more info.</a></p>
+  </div>
+
+<p>When I saw the ENS contest, I thought it would be a good opportunity to learn about the ENS protocol. I started reading the documentation before jumping into the code.</p>
+<p>If you aren&rsquo;t familiar with the ENS protocol, I suggest you to check out <a href="https://docs.ens.domains/learn/protocol">https://docs.ens.domains/learn/protocol</a>. But I&rsquo;ll provide a short summary from the docs:</p>
+<blockquote>
+<p>ENS maps human-readable names like &lsquo;alice.eth&rsquo; to machine-readable identifiers such as Ethereum addresses, other cryptocurrency addresses, content hashes, metadata, and more.</p>
+</blockquote>
+<p>So imagine how DNS works, but instead of mapping human-readable domains to IP addresses, it maps domain names to Ethereum addresses.</p>
+
+        </article>
+    </div>
+
+    
+
+            </div>
+        </div><footer class="text-center pb-1">
+    <small class="text-muted">
+        
+            &copy; 2024, Ulas Anil Acikel
+        
+        <br>
+        Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a>
+        and <a href="https://github.com/austingebauer/devise" target="_blank">Devise</a>
+    </small>
+</footer>
+</body>
+</html>

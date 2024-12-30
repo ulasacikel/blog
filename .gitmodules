@@ -1,0 +1,9 @@
+[submodule "themes/devise"]
+	path = themes/devise
+	url = https://github.com/austingebauer/devise.git
+[submodule "hugo-notice"]
+	path = hugo-notice
+	url = https://github.com/martignoni/hugo-notice.git
+[submodule "themes/hugo-shortcode-roneo-collection"]
+	path = themes/hugo-shortcode-roneo-collection
+	url = https://gitlab.com/Roneo/hugo-shortcode-roneo-collection.git
