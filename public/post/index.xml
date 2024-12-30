@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Security Research Blog</title>
-    <link>https://example.com/post/</link>
+    <link>http://localhost:1313/post/</link>
     <description>Recent content in Posts on Security Research Blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2024, Ulas Anil Acikel</copyright>
     <lastBuildDate>Tue, 17 Dec 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>A funny little overflow bug in ENS (Ethereum Name Service) that landed me $100,000</title>
-      <link>https://example.com/post/ens-bug/</link>
+      <link>http://localhost:1313/post/ens-bug/</link>
       <pubDate>Tue, 17 Dec 2024 00:00:00 +0000</pubDate>
-      <guid>https://example.com/post/ens-bug/</guid>
+      <guid>http://localhost:1313/post/ens-bug/</guid>
       <description>&lt;p&gt;Lets start with an arbitrary quote from Sun Tzu because why not and I like random quotes:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;know yourself and you will win all battles &lt;br&gt;&#xA;- Sun Tzu&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;This is my story about a funny little overflow bug I found in &lt;a href=&#34;https://ens.domains/&#34;&gt;ENS&lt;/a&gt; that landed me $100,000. The &amp;ldquo;funny&amp;rdquo; part is that I wasn&amp;rsquo;t even looking for a bug in the ENS protocol. I was just trying to understand how ENS works.&lt;/p&gt;</description>
     </item>
   </channel>
