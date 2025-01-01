@@ -5,9 +5,6 @@
     <loc>http://localhost:1313/</loc>
     <lastmod>2024-12-17T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/post/ens-bug/</loc>
-    <lastmod>2024-12-17T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/about/</loc>
     <lastmod>2024-12-17T00:00:00+00:00</lastmod>
   </url><url>
@@ -23,7 +20,7 @@
     <loc>http://localhost:1313/tags/ens/</loc>
     <lastmod>2024-12-17T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/index/</loc>
+    <loc>http://localhost:1313/post/ens-bug/</loc>
     <lastmod>2024-12-17T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/post/</loc>

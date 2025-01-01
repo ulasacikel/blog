@@ -1,6 +1,6 @@
 +++
 author = "Hugo Authors"
-title = "A funny little overflow bug in ENS (Ethereum Name Service) that landed me $100,000"
+title = "Integer overflow bug in ENS"
 date = "2024-12-17"
 description = "A funny little overflow bug in ENS that landed me $100,000"
 tags = [
@@ -32,4 +32,8 @@ If you aren't familiar with the ENS protocol, I suggest you to check out <https:
 >ENS maps human-readable names like 'alice.eth' to machine-readable identifiers such as Ethereum addresses, other cryptocurrency addresses, content hashes, metadata, and more. 
 
 So imagine how DNS works, but instead of mapping human-readable domains to IP addresses, it maps domain names to Ethereum addresses. 
+
+![Image alt](/images/ens-bug/ens.png)
+
+This is achieved by the ENS registry contract. It's a contract that stores the domain -> address mapping. The registry contract is deployed on the Ethereum mainnet and is the only contract that can register new domains.
 

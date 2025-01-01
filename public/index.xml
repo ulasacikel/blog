@@ -10,18 +10,18 @@
     <lastBuildDate>Tue, 17 Dec 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>A funny little overflow bug in ENS (Ethereum Name Service) that landed me $100,000</title>
-      <link>http://localhost:1313/post/ens-bug/</link>
-      <pubDate>Tue, 17 Dec 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/post/ens-bug/</guid>
-      <description>&lt;p&gt;Lets start with an arbitrary quote from Sun Tzu because why not and I like random quotes:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;know yourself and you will win all battles &lt;br&gt;&#xA;- Sun Tzu&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;This is my story about a funny little overflow bug I found in &lt;a href=&#34;https://ens.domains/&#34;&gt;ENS&lt;/a&gt; that landed me $100,000. The &amp;ldquo;funny&amp;rdquo; part is that I wasn&amp;rsquo;t even looking for a bug in the ENS protocol. I was just trying to understand how ENS works.&lt;/p&gt;</description>
-    </item>
-    <item>
       <title>About</title>
       <link>http://localhost:1313/about/</link>
       <pubDate>Tue, 17 Dec 2024 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/about/</guid>
       <description>&lt;h4 id=&#34;about&#34;&gt;About&lt;/h4&gt;&#xA;&lt;p&gt;Hello 👋 I’m Ulas. I live in Istanbul, Turkey.&lt;/p&gt;&#xA;&lt;p&gt;I am a freelance security researcher. I am interested in application security, blockchain security, and web3 security.&lt;/p&gt;&#xA;&lt;p&gt;Previously, I’ve worked as an application security engineer at &lt;a href=&#34;https://www.rootstocklabs.com&#34;&gt;RootstockLabs&lt;/a&gt;, &lt;a href=&#34;https://bugcrowd.com&#34;&gt;Bugcrowd&lt;/a&gt;, and &lt;a href=&#34;https://turkishairlines.com&#34;&gt;Turkish Airlines&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Integer overflow bug in ENS</title>
+      <link>http://localhost:1313/post/ens-bug/</link>
+      <pubDate>Tue, 17 Dec 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/post/ens-bug/</guid>
+      <description>&lt;p&gt;Lets start with an arbitrary quote from Sun Tzu because why not and I like random quotes:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;know yourself and you will win all battles &lt;br&gt;&#xA;- Sun Tzu&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;This is my story about a funny little overflow bug I found in &lt;a href=&#34;https://ens.domains/&#34;&gt;ENS&lt;/a&gt; that landed me $100,000. The &amp;ldquo;funny&amp;rdquo; part is that I wasn&amp;rsquo;t even looking for a bug in the ENS protocol. I was just trying to understand how ENS works.&lt;/p&gt;</description>
     </item>
     <item>
       <title></title>
