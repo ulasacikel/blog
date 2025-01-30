@@ -1,6 +1,6 @@
 +++
 author = "Hugo Authors"
-title = "Integer overflow bug in ENS"
+title = "Integer overflow vulnerability in ENS"
 date = "2024-12-17"
 description = "A funny little overflow bug in ENS that landed me $100,000"
 tags = [
@@ -35,5 +35,51 @@ So imagine how DNS works, but instead of mapping human-readable domains to IP ad
 
 ![Image alt](/images/ens-bug/ens.png)
 
-This is achieved by the ENS registry contract. It's a contract that stores the domain -> address mapping. The registry contract is deployed on the Ethereum mainnet and is the only contract that can register new domains.
+This is achieved by the ETH registrar contract. It's a contract that stores the mapping of the `.eth` subdomains to Ethereum addresses. [The ETH registrar contract](https://etherscan.io/address/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85) is deployed on the Ethereum mainnet and is the only contract that can register new `.eth` subdomains. This is an oversimplified explanation, but it's good enough for this post.
+
+
+The actual flow of registering a new `.eth` subdomain is something like this:
+![Image alt](/images/ens-bug/ens-flow.png)
+
+From the diagram above, it can be seen that EOAs cannot directly interact with the ETH Base Registrar contract. They have to use a controller contract to do so. Controllers handle the fees and the registration process. Also, controllers are trusted contracts that are deployed by the ENS team. Lets keep this in mind for now.
+
+#### Finding the gem in the documentation
+
+The ENS documentation has been updated since the bug was found. I'll link the archived version of the docs instead. While reading [the old ENS documentation](https://web.archive.org/web/20230331002457/https://docs.ens.domains/contract-api-reference/.eth-permanent-registrar), something caught my attention under the System Architecture section:
+
+>Controllers may register new domains and extend the expiry of (renew) existing domains. **They can not change the ownership or reduce the expiration time of existing domains.**
+
+This is a very important point. It ensures the censorship resistance of the ENS protocol. If controllers could change the ownership or reduce the expiration time of existing domains, the ENS protocol could be easily censored by the ENS team or ENS DAO.
+
+With that in mind, I started reading the code of the ETH Base Registrar contract.
+
+#### The overflow
+
+Lets take a look at the `renew` function of [the ETH Base Registrar contract](https://github.com/ensdomains/ens-contracts/blob/master/contracts/ethregistrar/BaseRegistrarImplementation.sol#L171):
+
+```solidity
+    function renew(
+        uint256 id,
+        uint256 duration
+    ) external override live onlyController returns (uint256) {
+        require(expiries[id] + GRACE_PERIOD >= block.timestamp); // Name must be registered here or in grace period
+        require(
+            expiries[id] + duration + GRACE_PERIOD > duration + GRACE_PERIOD
+        ); // Prevent future overflow
+
+        expiries[id] += duration;
+        emit NameRenewed(id, expiries[id]);
+        return expiries[id];
+    }
+```
+
+
+
+
+
+
+
+
+
+
 

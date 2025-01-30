@@ -95,7 +95,7 @@
 <div class="container">
     <div class="pl-sm-2">
         <div class="mb-3">
-            <h3 class="mb-0">Integer overflow bug in ENS</h3>
+            <h3 class="mb-0">Integer overflow vulnerability in ENS</h3>
             
             <small class="text-muted">Published December 17, 2024</small>
         </div>
@@ -218,8 +218,33 @@
 </blockquote>
 <p>So imagine how DNS works, but instead of mapping human-readable domains to IP addresses, it maps domain names to Ethereum addresses.</p>
 <p><img src="../../images/ens-bug/ens.png" alt="Image alt"></p>
-<p>This is achieved by the ENS registry contract. It&rsquo;s a contract that stores the domain -&gt; address mapping. The registry contract is deployed on the Ethereum mainnet and is the only contract that can register new domains.</p>
-
+<p>This is achieved by the ETH registrar contract. It&rsquo;s a contract that stores the mapping of the <code>.eth</code> subdomains to Ethereum addresses. <a href="https://etherscan.io/address/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85">The ETH registrar contract</a> is deployed on the Ethereum mainnet and is the only contract that can register new <code>.eth</code> subdomains. This is an oversimplified explanation, but it&rsquo;s good enough for this post.</p>
+<p>The actual flow of registering a new <code>.eth</code> subdomain is something like this:
+<img src="../../images/ens-bug/ens-flow.png" alt="Image alt"></p>
+<p>From the diagram above, it can be seen that EOAs cannot directly interact with the ETH Base Registrar contract. They have to use a controller contract to do so. Controllers handle the fees and the registration process. Also, controllers are trusted contracts that are deployed by the ENS team. Lets keep this in mind for now.</p>
+<h4 id="finding-the-gem-in-the-documentation">Finding the gem in the documentation</h4>
+<p>The ENS documentation has been updated since the bug was found. I&rsquo;ll link the archived version of the docs instead. While reading <a href="https://web.archive.org/web/20230331002457/https://docs.ens.domains/contract-api-reference/.eth-permanent-registrar">the old ENS documentation</a>, something caught my attention under the System Architecture section:</p>
+<blockquote>
+<p>Controllers may register new domains and extend the expiry of (renew) existing domains. <strong>They can not change the ownership or reduce the expiration time of existing domains.</strong></p>
+</blockquote>
+<p>This is a very important point. It ensures the censorship resistance of the ENS protocol. If controllers could change the ownership or reduce the expiration time of existing domains, the ENS protocol could be easily censored by the ENS team or ENS DAO.</p>
+<p>With that in mind, I started reading the code of the ETH Base Registrar contract.</p>
+<h4 id="the-overflow">The overflow</h4>
+<p>Lets take a look at the <code>renew</code> function of <a href="https://github.com/ensdomains/ens-contracts/blob/master/contracts/ethregistrar/BaseRegistrarImplementation.sol#L171">the ETH Base Registrar contract</a>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-solidity" data-lang="solidity"><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">renew</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">uint256</span> id,
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">uint256</span> duration
+</span></span><span style="display:flex;"><span>    ) <span style="color:#66d9ef">external</span> <span style="color:#66d9ef">override</span> live onlyController <span style="color:#66d9ef">returns</span> (<span style="color:#66d9ef">uint256</span>) {
+</span></span><span style="display:flex;"><span>        require(expiries[id] <span style="color:#f92672">+</span> GRACE_PERIOD <span style="color:#f92672">&gt;=</span> block.timestamp); <span style="color:#75715e">// Name must be registered here or in grace period
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        require(
+</span></span><span style="display:flex;"><span>            expiries[id] <span style="color:#f92672">+</span> duration <span style="color:#f92672">+</span> GRACE_PERIOD <span style="color:#f92672">&gt;</span> duration <span style="color:#f92672">+</span> GRACE_PERIOD
+</span></span><span style="display:flex;"><span>        ); <span style="color:#75715e">// Prevent future overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>        expiries[id] <span style="color:#f92672">+=</span> duration;
+</span></span><span style="display:flex;"><span>        emit NameRenewed(id, expiries[id]);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> expiries[id];
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div>
         </article>
     </div>
 
