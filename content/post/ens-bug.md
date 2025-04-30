@@ -1,6 +1,6 @@
 +++
 author = "Hugo Authors"
-title = "Integer overflow vulnerability in ENS"
+title = "Overflowing the ENS Registrar"
 date = "2024-12-17"
 description = "A funny little overflow bug in ENS that landed me $100,000"
 tags = [
@@ -72,6 +72,59 @@ Lets take a look at the `renew` function of [the ETH Base Registrar contract](ht
         return expiries[id];
     }
 ```
+
+It takes two arguments: the id of the domain and the duration of the renewal. The duration is added to the expiry of the domain. The `GRACE_PERIOD` is 90 days and it's constant.
+
+The first `require` statement ensures that the domain is registered or in the grace period. The second `require` statement ensures that the duration does not overflow the expiry of the domain.
+
+But do you see the problem here? I recommend you to pause for a moment and think about it.
+
+...
+
+...
+
+...
+
+At first glance, everything looks fine. The second `require` is supposed to prevent an integer overflow when adding duration. But let's look closely.
+
+The duration is user-supplied. So what happens if the user sets duration to `2^256 - GRACE_PERIOD`?
+
+```Solidity
+expiries[id] + duration + GRACE_PERIOD > duration + GRACE_PERIOD
+```
+
+Both sides of this expression will overflow and wrap around, making the condition always true. The check is completely bypassed.
+
+And then this line executes:
+
+```Solidity
+expiries[id] += duration;
+```
+
+This causes `expiries[id]` itself to overflow. If `expiries[id]` was larger than `GRACE_PERIOD`, then adding duration (which is effectively `-GRACE_PERIOD`) reduces `expiries[id]` instead of increasing it!
+
+By repeatedly calling `renew` with this specially crafted duration, an attacker can actually force an ENS domain's expiration time to go down, eventually expiring it. That’s a direct violation of the protocol's design guarantee from the documentation.
+
+#### Impact
+
+If exploited, this vulnerability could allow an attacker (or a malicious DAO controller) to force the expiration of any `.eth` domain. Once expired, the attacker could quickly register and claim the domain as their own.
+
+Now, practically speaking, this attack has some big caveats:
+
+* Calling `renew` costs ETH proportional to the `duration`. So using this to expire a valuable domain like `vitalik.eth` would require an astronomical amount of ETH—more than even exists.
+
+* But if ENS ever introduces a fixed-price, unlimited-renewal system (like a subscription model), this bug becomes immediately exploitable.
+
+So while it's not exploitable today in the real world, it’s a serious design flaw that could become critical in future changes.
+
+
+#### The fix
+
+Since the ENS ETH registrar contract is not a proxy contract, it's immutable. So, this issue cannot be fixed easily. ENS team introduced a patch in [this commit](https://github.com/ensdomains/ens-contracts/commit/e6b136e979084de3761c125142620304173990ca) that could in theory fix the issue however they decided to not deploy the fix as of now. The [ENS discussion board](https://discuss.ens.domains/t/security-advisory-a-malicious-dao-update-could-reduce-the-registration-duration-of-registered-eth-2lds/17576/8) has comments on explaining the reason behind their decision. The fix is too complicated to go over in this blogpost. So I'll leave it to the readers to go and check it out.
+
+
+
+
 
 
 

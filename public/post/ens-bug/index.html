@@ -95,7 +95,7 @@
 <div class="container">
     <div class="pl-sm-2">
         <div class="mb-3">
-            <h3 class="mb-0">Integer overflow vulnerability in ENS</h3>
+            <h3 class="mb-0">Overflowing the ENS Registrar</h3>
             
             <small class="text-muted">Published December 17, 2024</small>
         </div>
@@ -244,7 +244,35 @@
 </span></span><span style="display:flex;"><span>        emit NameRenewed(id, expiries[id]);
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> expiries[id];
 </span></span><span style="display:flex;"><span>    }
-</span></span></code></pre></div>
+</span></span></code></pre></div><p>It takes two arguments: the id of the domain and the duration of the renewal. The duration is added to the expiry of the domain. The <code>GRACE_PERIOD</code> is 90 days and it&rsquo;s constant.</p>
+<p>The first <code>require</code> statement ensures that the domain is registered or in the grace period. The second <code>require</code> statement ensures that the duration does not overflow the expiry of the domain.</p>
+<p>But do you see the problem here? I recommend you to pause for a moment and think about it.</p>
+<p>&hellip;</p>
+<p>&hellip;</p>
+<p>&hellip;</p>
+<p>At first glance, everything looks fine. The second <code>require</code> is supposed to prevent an integer overflow when adding duration. But let&rsquo;s look closely.</p>
+<p>The duration is user-supplied. So what happens if the user sets duration to <code>2^256 - GRACE_PERIOD</code>?</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Solidity" data-lang="Solidity"><span style="display:flex;"><span>expiries[id] <span style="color:#f92672">+</span> duration <span style="color:#f92672">+</span> GRACE_PERIOD <span style="color:#f92672">&gt;</span> duration <span style="color:#f92672">+</span> GRACE_PERIOD
+</span></span></code></pre></div><p>Both sides of this expression will overflow and wrap around, making the condition always true. The check is completely bypassed.</p>
+<p>And then this line executes:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Solidity" data-lang="Solidity"><span style="display:flex;"><span>expiries[id] <span style="color:#f92672">+=</span> duration;
+</span></span></code></pre></div><p>This causes <code>expiries[id]</code> itself to overflow. If <code>expiries[id]</code> was larger than <code>GRACE_PERIOD</code>, then adding duration (which is effectively <code>-GRACE_PERIOD</code>) reduces <code>expiries[id]</code> instead of increasing it!</p>
+<p>By repeatedly calling <code>renew</code> with this specially crafted duration, an attacker can actually force an ENS domain&rsquo;s expiration time to go down, eventually expiring it. That’s a direct violation of the protocol&rsquo;s design guarantee from the documentation.</p>
+<h4 id="impact">Impact</h4>
+<p>If exploited, this vulnerability could allow an attacker (or a malicious DAO controller) to force the expiration of any <code>.eth</code> domain. Once expired, the attacker could quickly register and claim the domain as their own.</p>
+<p>Now, practically speaking, this attack has some big caveats:</p>
+<ul>
+<li>
+<p>Calling <code>renew</code> costs ETH proportional to the <code>duration</code>. So using this to expire a valuable domain like <code>vitalik.eth</code> would require an astronomical amount of ETH—more than even exists.</p>
+</li>
+<li>
+<p>But if ENS ever introduces a fixed-price, unlimited-renewal system (like a subscription model), this bug becomes immediately exploitable.</p>
+</li>
+</ul>
+<p>So while it&rsquo;s not exploitable today in the real world, it’s a serious design flaw that could become critical in future changes.</p>
+<h4 id="the-fix">The fix</h4>
+<p>Since the ENS ETH registrar contract is not a proxy contract, it&rsquo;s immutable. So, this issue cannot be fixed easily. ENS team introduced a patch in <a href="https://github.com/ensdomains/ens-contracts/commit/e6b136e979084de3761c125142620304173990ca">this commit</a> that could in theory fix the issue however they decided to not deploy the fix as of now. The <a href="https://discuss.ens.domains/t/security-advisory-a-malicious-dao-update-could-reduce-the-registration-duration-of-registered-eth-2lds/17576/8">ENS discussion board</a> has comments on explaining the reason behind their decision. The fix is too complicated to go over in this blogpost. So I&rsquo;ll leave it to the readers to go and check it out.</p>
+
         </article>
     </div>
 
