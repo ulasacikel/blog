@@ -1,7 +1,7 @@
 +++
 date = '2026-09-30T00:34:09+03:00'
 draft = false
-title = 'One JWT, Two Parsers'
+title = 'Forging Transactions on a Cosmos SDK Chain'
 description = "A parser differential in a smart account's JWT check that let me forge transactions for other users' accounts and landed me $150,000"
 tags = [
     "Cosmos SDK",
