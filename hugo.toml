@@ -1,7 +1,7 @@
 baseURL = "https://ulasec.netlify.app"
 title = "Security Research Blog"
-languageCode = "en-us"
-theme = ["devise","hugo-shortcode-roneo-collection"]
+locale = "en-US"
+theme = "devise"
 relativeURLs = true
 enableEmoji = true
 googleAnalytics = ""

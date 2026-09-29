@@ -1,0 +1,6 @@
+# Hugo regenerates these assets during local builds.
+resources/_gen/
+
+# Finder metadata.
+.DS_Store
+Claude outputs/
