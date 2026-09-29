@@ -35,7 +35,7 @@ copyright = "&copy; 2024, Ulas Anil Acikel"
   header_title = "Ulas Anil Acikel"                 # Your header title
   header_subtitle = "Application Security Engineer | Istanbul" # Your header subtitle
   home_image = "/images/profile.jpeg"          # Path to header image starting from the static directory (optional)
-  recent_posts = 5                           # Max amount of recent posts to show
+  recent_posts = 1                           # Max amount of recent posts to show
   mainSections = ["posts", "post", "blog"]   # Main sections to include in recent posts
   [params.style]                             # CSS style overrides
     backgroundColor = "#f8f9fa"
