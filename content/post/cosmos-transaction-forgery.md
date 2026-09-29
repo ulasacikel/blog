@@ -1,6 +1,6 @@
 +++
 date = '2026-09-30T00:34:09+03:00'
-draft = true
+draft = false
 title = 'One JWT, Two Parsers'
 description = "A parser differential in a smart account's JWT check that let me forge transactions for other users' accounts and landed me $150,000"
 tags = [
