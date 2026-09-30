@@ -24,6 +24,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 <html lang="{{ .Site.Language.Locale | default "en" }}">
     {{- partial "head.html" . -}}
     <body>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch between light and dark theme" title="Switch theme">
+            <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+            <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+        </button>
         <div id="content" class="mx-auto">
             {{- partial "header.html" . -}}
             <div class="container">
@@ -31,5 +35,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             </div>
         </div>
         {{- partial "footer.html" . -}}
+        <script>
+            (function () {
+                var root = document.documentElement;
+                function current() {
+                    var t = root.getAttribute("data-theme");
+                    if (t) return t;
+                    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+                }
+                document.getElementById("theme-toggle").addEventListener("click", function () {
+                    var next = current() === "dark" ? "light" : "dark";
+                    root.setAttribute("data-theme", next);
+                    try { localStorage.setItem("theme", next); } catch (e) {}
+                });
+            })();
+        </script>
     </body>
 </html>

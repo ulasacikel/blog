@@ -1,0 +1,137 @@
+// Dark theme.
+// By default the site follows the reader's OS/browser setting. The toggle
+// button (layouts/_default/baseof.html) sets data-theme="light" or "dark" on
+// <html>, which overrides the system setting and is remembered in localStorage.
+// The theme's head.html loads this file after its own styles.
+
+@mixin dark-theme {
+  color-scheme: dark;
+
+  body {
+    background-color: #16181b;
+    color: #d4d7dc;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #eceef1;
+  }
+
+  // Site title in the header
+  header h2 a,
+  header h2 a:hover {
+    color: #eceef1;
+  }
+
+  a {
+    color: #6ea8fe;
+  }
+
+  a:hover {
+    color: #9ec5fe;
+  }
+
+  .text-muted {
+    color: #9aa0a6 !important;
+  }
+
+  // "Recent" / category labels use inverted page colors
+  .category {
+    background-color: #d4d7dc;
+    color: #16181b;
+  }
+
+  hr {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.25),
+            rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0));
+  }
+
+  #home-image {
+    border-color: #2a2d31;
+  }
+
+  blockquote {
+    background: #1d2024;
+    border-left-color: #3a3f45;
+  }
+
+  blockquote:before {
+    color: #3a3f45;
+  }
+
+  // Code blocks without a language (plain ``` fences)
+  pre {
+    color: #d4d7dc;
+  }
+
+  .highlight > pre {
+    border-color: #2a2d31;
+  }
+
+  // The box shortcode sets dark grey text in its own <style>;
+  // the extra "body" makes this rule win.
+  body .box-shortcode {
+    color: #d4d7dc;
+  }
+
+  // Post images: give transparent PNGs a white backdrop and tone down the glare
+  .container img {
+    background-color: #fff;
+    filter: brightness(0.92);
+  }
+
+  .theme-toggle {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .theme-toggle .icon-moon {
+    display: none;
+  }
+
+  .theme-toggle .icon-sun {
+    display: inline-block;
+  }
+}
+
+html[data-theme="dark"] {
+  @include dark-theme;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    @include dark-theme;
+  }
+}
+
+// Toggle button (light theme defaults)
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.theme-toggle:focus {
+  outline: none;
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid #6ea8fe;
+  outline-offset: 2px;
+}
+
+.theme-toggle .icon-sun {
+  display: none;
+}
